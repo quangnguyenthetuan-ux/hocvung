@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashVocab Mobile Pro</title>
+    <title>FlashVocab Ultimate Mobile</title>
     <style>
         :root {
             --bg: #0f0c29; --card: #242445; --text: #ffffff;
@@ -16,84 +16,86 @@
             margin: 0; min-height: 100vh; padding-bottom: 80px;
         }
 
-        /* --- GIAO DIỆN HÀNG NGANG (TỪ TRÁI - NGHĨA PHẢI) --- */
+        /* --- GIAO DIỆN 2 CỘT (TỪ TRÁI - NGHĨA PHẢI) --- */
         .flash-card-main, .word-row {
             background: var(--card); margin: 10px auto; padding: 15px;
-            border-radius: 12px; display: flex; align-items: center;
-            width: 92%; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 15px; display: flex; align-items: center;
+            width: 94%; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);
         }
-        .word-left { width: 35%; font-weight: bold; font-size: 1.1rem; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 10px; }
-        .meaning-right { width: 65%; padding-left: 12px; font-size: 0.95rem; color: #ccc; }
+        .word-left { width: 35%; font-weight: bold; font-size: 1.1rem; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 10px; color: var(--accent); }
+        .meaning-right { width: 65%; padding-left: 12px; font-size: 0.9rem; color: #ddd; }
 
-        /* --- THANH ĐIỀU HƯỚNG DƯỚI --- */
+        /* --- THANH MENU DƯỚI --- */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 70px;
             background: var(--card); display: flex; justify-content: space-around;
             align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 9999;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; }
-        .nav-icon { font-size: 24px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; color: #aaa; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
 
-        /* --- FLASHCARD 2 MẶT (LẬT ĐỂ XEM) --- */
+        /* --- FLASHCARD 2 MẶT (LẬT) --- */
         .card-box { width: 90%; height: 400px; perspective: 1000px; margin: 20px auto; }
-        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
         .card-inner.is-flipped { transform: rotateY(180deg); }
         .card-face {
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 25px; padding: 20px; text-align: center; box-sizing: border-box;
-            background: #2d2d5a; border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 30px; padding: 25px; text-align: center; box-sizing: border-box;
+            background: #2d2d5a; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
-        .card-front { font-size: 3rem; font-weight: bold; }
-        .card-back { transform: rotateY(180deg); background: #1e1e3f; font-size: 1.2rem; }
+        .card-front { font-size: 2.8rem; font-weight: bold; color: white; }
+        .card-back { transform: rotateY(180deg); background: #1a1a3a; font-size: 1.1rem; color: #ccc; }
 
-        /* --- NÚT BẤM QUIZ CHO ĐIỆN THOẠI --- */
-        .quiz-controls { display: flex; gap: 10px; width: 90%; margin-top: 20px; }
-        .btn-action { 
-            flex: 1; padding: 15px; border-radius: 12px; border: none; 
-            font-weight: bold; font-size: 1rem; cursor: pointer;
+        /* --- QUIZ GRID & OPTIONS --- */
+        .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 94%; margin: 20px auto; }
+        .quiz-option { 
+            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; 
+            text-align: center; border: 1px solid #444; min-height: 80px;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
         }
-        .btn-check { background: var(--green); color: #000; }
-        .btn-next { background: var(--accent); color: #000; }
+        .correct { border-color: var(--green) !important; background: rgba(46, 213, 115, 0.2) !important; }
+        .wrong { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.2) !important; }
 
         /* MODAL FULL SCREEN */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; }
-        .modal { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .close-btn { align-self: flex-end; padding: 10px 20px; background: var(--red); border-radius: 10px; border: none; color: white; margin-bottom: 20px; }
-        
-        .spell-input { width: 90%; padding: 15px; font-size: 1.5rem; border-radius: 10px; background: #000; color: #fff; border: 1px solid #444; text-align: center; }
-        .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; margin: 20px 0; }
-        .quiz-option { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #444; }
-        .correct { border-color: var(--green) !important; background: rgba(46, 213, 115, 0.2); }
-        .wrong { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.2); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; overflow-y: auto; }
+        .modal { width: 100%; min-height: 100%; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .close-btn { align-self: flex-end; padding: 10px 20px; background: var(--red); border-radius: 12px; border: none; color: white; font-weight: bold; }
+
+        .btn-action { width: 94%; padding: 18px; border-radius: 15px; border: none; font-weight: bold; font-size: 1.1rem; margin: 10px auto; display: block; }
+        .spell-input { width: 94%; padding: 18px; font-size: 1.8rem; border-radius: 15px; background: #000; color: #fff; border: 2px solid #444; text-align: center; margin: 20px auto; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="header-section" style="text-align: center; padding: 20px;">
-        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 20px; display: inline-block;">
-            📊 Kho: <span id="total-words-count" style="color: var(--accent);">0</span> từ
+    <div class="header-section" style="text-align: center; padding: 25px 0;">
+        <div style="background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 20px; display: inline-block; font-size: 14px;">
+            📊 Tổng kho: <span id="total-words-count" style="color: var(--accent);">0</span> từ vựng
         </div>
         <br><br>
-        <input type="text" id="search-input" placeholder="Tìm từ hoặc thêm nhanh..." style="width: 80%; padding: 12px; border-radius: 20px; border: none;">
+        <input type="text" id="search-input" placeholder="Tìm kiếm nhanh..." style="width: 85%; padding: 15px; border-radius: 25px; border: none; outline: none; font-size: 16px;">
     </div>
 
-    <div id="reminder-box" class="main-container"></div>
+    <div id="reminder-box"></div>
 
     <div id="tl-overlay" class="overlay">
         <div class="modal">
-            <button class="close-btn" onclick="Modules.UI.closeAll()">Đóng X</button>
+            <button class="close-btn" onclick="Modules.UI.closeAll()">ĐÓNG X</button>
+            <h2 style="text-align: center; color: var(--accent);">📖 THƯ VIỆN CỦA BẠN</h2>
             <div id="vocab-list"></div>
         </div>
     </div>
 
     <div id="to-overlay" class="overlay">
         <div class="modal">
-            <button class="close-btn" onclick="Modules.UI.closeAll()">Đóng X</button>
-            <div id="to-menu" style="text-align: center;">
-                <input type="date" id="study-date" style="padding: 10px; border-radius: 10px; margin-bottom: 20px;">
-                <button onclick="Modules.TO.start(1)" style="width: 80%; padding: 20px; margin-bottom: 10px; border-radius: 15px; background: var(--card); color: white;">1. Flashcard (Lật mặt)</button>
-                <button onclick="Modules.TO.start(2)" style="width: 80%; padding: 20px; border-radius: 15px; background: var(--card); color: white;">2. Bài tập Quiz</button>
+            <button class="close-btn" onclick="Modules.UI.closeAll()">ĐÓNG X</button>
+            
+            <div id="to-menu" style="text-align: center; margin-top: 50px;">
+                <p>Chọn ngày học:</p>
+                <input type="date" id="study-date" style="padding: 15px; border-radius: 10px; font-size: 1rem; border: none; margin-bottom: 30px;">
+                <button class="btn-action" style="background: var(--card); color: white;" onclick="Modules.TO.start(1)">1. FLASHCARD (LẬT MẶT)</button>
+                <button class="btn-action" style="background: var(--card); color: white;" onclick="Modules.TO.start(2)">2. BÀI TẬP TRẮC NGHIỆM & VIẾT</button>
             </div>
 
             <div id="play-f" style="display: none; flex-direction: column; align-items: center;">
@@ -103,24 +105,27 @@
                         <div class="card-face card-back" id="txt-fm"></div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 20px;">
-                    <button onclick="Modules.TO.moveCard(-1)" style="font-size: 2rem; background: none; border: none; color: white;">⬅️</button>
-                    <button onclick="Modules.TO.moveCard(1)" style="font-size: 2rem; background: none; border: none; color: white;">➡️</button>
+                <div style="display: flex; gap: 30px; margin-top: 20px;">
+                    <button onclick="Modules.TO.moveCard(-1)" style="font-size: 3rem; background: none; border: none; color: white;">⬅️</button>
+                    <button onclick="Modules.TO.moveCard(1)" style="font-size: 3rem; background: none; border: none; color: white;">➡️</button>
                 </div>
+                <p id="f-prog" style="margin-top: 20px; opacity: 0.5;"></p>
             </div>
 
             <div id="play-q" style="display: none; flex-direction: column; align-items: center; width: 100%;">
-                <h2 id="q-text" style="color: var(--accent); font-size: 2rem;"></h2>
+                <p id="q-label" style="opacity: 0.6; margin-top: 20px;"></p>
+                <h2 id="q-text" style="color: var(--accent); font-size: 2.2rem; text-align: center; padding: 0 20px;"></h2>
+                
                 <div id="q-mc" class="quiz-grid"></div>
-                <div id="q-spell" style="display: none; width: 100%; text-align: center;">
-                    <input type="text" id="q-in" class="spell-input" placeholder="Nhập đáp án...">
-                    <div class="quiz-controls">
-                        <button class="btn-action btn-check" onclick="Modules.Quiz.checkSpell()">KIỂM TRA ✅</button>
-                    </div>
+                
+                <div id="q-spell" style="display: none; width: 100%;">
+                    <input type="text" id="q-in" class="spell-input" placeholder="Nhập đáp án..." autocomplete="off">
+                    <button class="btn-action" style="background: var(--green); color: black;" onclick="Modules.Quiz.checkSpell()">KIỂM TRA ✅</button>
                 </div>
-                <div id="q-result-area" style="display: none; width: 90%; margin-top: 20px; text-align: center;">
-                    <p id="q-hint"></p>
-                    <button class="btn-action btn-next" onclick="Modules.Quiz.next()">CÂU TIẾP THEO ➡️</button>
+
+                <div id="q-result-area" style="display: none; width: 100%; text-align: center; margin-top: 10px;">
+                    <div id="q-hint" style="background: rgba(255,255,255,0.1); padding: 15px; margin: 10px; border-radius: 15px; font-size: 0.9rem;"></div>
+                    <button class="btn-action" style="background: var(--accent); color: black;" onclick="Modules.Quiz.next()">CÂU TIẾP THEO ➡️</button>
                 </div>
             </div>
         </div>
@@ -142,7 +147,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const DB_KEY = 'FLASH_VOCAB_FINAL';
         const firebaseConfig = {
             apiKey: "AIzaSyB-dtRxkkhXZ8UTuBNi81tSGf-RHFRVtrw",
             authDomain: "flashvocab-7b7c3.firebaseapp.com",
@@ -156,20 +160,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const State = {
-            vocab: [],
-            daily: { list: [] },
-            idx: 0,
-            sessionPool: [],
-            answered: false
-        };
+        const State = { vocab: [], sessionPool: [], idx: 0, answered: false };
 
         const Modules = {
             UI: {
                 renderMain: () => {
                     document.getElementById('total-words-count').innerText = State.vocab.length;
                     const box = document.getElementById('reminder-box');
-                    box.innerHTML = State.vocab.slice(-5).map(i => `
+                    // Chỉ hiện 10 từ mới nhất ở trang chủ
+                    box.innerHTML = State.vocab.slice(-10).reverse().map(i => `
                         <div class="flash-card-main">
                             <div class="word-left">${i.w}</div>
                             <div class="meaning-right">${i.m.split(' // ')[1] || i.m}</div>
@@ -182,16 +181,16 @@
             },
             TL: {
                 open: () => {
-                    Modules.UI.closeAll(); // Tắt ôn tập nếu đang mở
+                    Modules.UI.closeAll();
                     document.getElementById('tl-overlay').style.display = 'block';
                     Modules.TL.render();
                 },
                 render: () => {
-                    document.getElementById('vocab-list').innerHTML = State.vocab.map((i, idx) => `
+                    document.getElementById('vocab-list').innerHTML = State.vocab.slice().reverse().map((i, idx) => `
                         <div class="word-row">
                             <div class="word-left">${i.w}</div>
                             <div class="meaning-right">${i.m.split(' // ')[1] || i.m}</div>
-                            <button onclick="Modules.TL.del(${idx})">🗑️</button>
+                            <button onclick="Modules.TL.del(${State.vocab.length - 1 - idx})" style="background:none; border:none; font-size:1.2rem;">🗑️</button>
                         </div>
                     `).join('');
                 },
@@ -204,93 +203,123 @@
             },
             TO: {
                 open: () => {
-                    Modules.UI.closeAll(); // Tắt thư viện nếu đang mở
+                    Modules.UI.closeAll();
                     document.getElementById('to-overlay').style.display = 'block';
                     document.getElementById('to-menu').style.display = 'block';
                     document.getElementById('play-f').style.display = 'none';
                     document.getElementById('play-q').style.display = 'none';
+                    document.getElementById('study-date').value = new Date().toISOString().split('T')[0];
                 },
                 start: (mode) => {
                     const date = document.getElementById('study-date').value;
-                    const formattedDate = date.split('-').reverse().map(x => parseInt(x)).join('/');
-                    State.sessionPool = State.vocab.filter(v => v.d === formattedDate);
+                    const parts = date.split('-');
+                    const formatted = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
                     
-                    if(State.sessionPool.length === 0) return alert("Ngày này không có từ vựng!");
-                    
+                    const pool = State.vocab.filter(v => v.d === formatted);
+                    if(pool.length === 0) return alert("Ngày này chưa có từ nào!");
+
                     document.getElementById('to-menu').style.display = 'none';
                     State.idx = 0;
+
                     if(mode === 1) {
+                        State.sessionPool = pool.sort(() => Math.random() - 0.5);
                         document.getElementById('play-f').style.display = 'flex';
                         Modules.TO.renderF();
                     } else {
+                        // Trộn 3 dạng câu hỏi cho mỗi từ
+                        let qList = [];
+                        pool.forEach(w => {
+                            const vi = w.m.split(' // ')[1]?.split(' // ')[0] || w.m;
+                            qList.push({ t: 'EV', q: w.w, a: vi, o: w }, 
+                                       { t: 'VE', q: vi, a: w.w, o: w }, 
+                                       { t: 'SP', q: vi, a: w.w, o: w });
+                        });
+                        State.sessionPool = qList.sort(() => Math.random() - 0.5);
                         document.getElementById('play-q').style.display = 'flex';
-                        Modules.Quiz.init();
+                        Modules.Quiz.render();
                     }
                 },
                 renderF: () => {
                     const i = State.sessionPool[State.idx];
                     document.getElementById('c-inner').classList.remove('is-flipped');
                     document.getElementById('txt-fw').innerText = i.w;
-                    document.getElementById('txt-fm').innerHTML = i.m.replace(/\/\/ /g, '<br>');
+                    document.getElementById('txt-fm').innerHTML = `<div style="font-size:0.9rem; opacity:0.6; margin-bottom:15px;">NGHĨA & VÍ DỤ:</div>` + i.m.replace(/\/\/ /g, '<br><br>');
+                    document.getElementById('f-prog').innerText = `${State.idx + 1} / ${State.sessionPool.length}`;
                 },
                 flip: () => document.getElementById('c-inner').classList.toggle('is-flipped'),
                 moveCard: (d) => {
                     State.idx += d;
                     if(State.idx < 0) State.idx = 0;
-                    else if(State.idx >= State.sessionPool.length) alert("Đã hết thẻ!");
+                    else if(State.idx >= State.sessionPool.length) alert("Đã hoàn thành!");
                     else Modules.TO.renderF();
                 }
             },
             Quiz: {
-                init: () => {
-                    State.idx = 0;
-                    Modules.Quiz.render();
-                },
                 render: () => {
                     State.answered = false;
                     document.getElementById('q-result-area').style.display = 'none';
                     const cur = State.sessionPool[State.idx];
-                    document.getElementById('q-text').innerText = cur.m.split(' // ')[1] || "Tra nghĩa...";
-                    
-                    document.getElementById('q-mc').style.display = 'none'; // Đơn giản hóa: Dùng điền từ cho mobile
-                    document.getElementById('q-spell').style.display = 'block';
-                    document.getElementById('q-in').value = '';
+                    document.getElementById('q-text').innerText = cur.q;
+                    document.getElementById('q-label').innerText = (cur.t === 'EV' ? "CHỌN NGHĨA ĐÚNG" : (cur.t === 'VE' ? "CHỌN TỪ ĐÚNG" : "VIẾT LẠI TỪ VỰNG"));
+
+                    if(cur.t === 'SP') {
+                        document.getElementById('q-mc').style.display = 'none';
+                        document.getElementById('q-spell').style.display = 'block';
+                        document.getElementById('q-in').value = '';
+                    } else {
+                        document.getElementById('q-mc').style.display = 'grid';
+                        document.getElementById('q-spell').style.display = 'none';
+                        
+                        // Tạo 3 đáp án nhiễu
+                        let opts = [cur.a];
+                        let dist = State.vocab.filter(v => v.w !== cur.o.w)
+                                    .map(v => cur.t === 'EV' ? (v.m.split(' // ')[1] || v.m) : v.w)
+                                    .sort(() => Math.random() - 0.5).slice(0, 3);
+                        opts.push(...dist);
+                        opts.sort(() => Math.random() - 0.5);
+
+                        document.getElementById('q-mc').innerHTML = opts.map(o => `
+                            <div class="quiz-option" onclick="Modules.Quiz.checkMC(this, '${o.replace(/'/g, "\\'")}')">${o}</div>
+                        `).join('');
+                    }
+                },
+                checkMC: (el, val) => {
+                    if(State.answered) return; State.answered = true;
+                    const cur = State.sessionPool[State.idx];
+                    if(val === cur.a) el.classList.add('correct');
+                    else el.classList.add('wrong');
+                    Modules.Quiz.showResult();
                 },
                 checkSpell: () => {
-                    if(State.answered) return;
-                    State.answered = true;
+                    if(State.answered) return; State.answered = true;
                     const cur = State.sessionPool[State.idx];
                     const input = document.getElementById('q-in');
-                    if(input.value.trim().toLowerCase() === cur.w.toLowerCase()) {
-                        input.style.borderColor = 'var(--green)';
-                    } else {
-                        input.style.borderColor = 'var(--red)';
-                    }
-                    document.getElementById('q-hint').innerHTML = `Đáp án đúng: <b style="color:var(--accent)">${cur.w}</b>`;
+                    if(input.value.trim().toLowerCase() === cur.a.toLowerCase()) input.style.borderColor = 'var(--green)';
+                    else input.style.borderColor = 'var(--red)';
+                    Modules.Quiz.showResult();
+                },
+                showResult: () => {
+                    const cur = State.sessionPool[State.idx];
+                    document.getElementById('q-hint').innerHTML = `Đáp án đúng: <b style="color:var(--accent); font-size:1.2rem;">${cur.a}</b><br><br><small>${cur.o.m}</small>`;
                     document.getElementById('q-result-area').style.display = 'block';
                 },
                 next: () => {
                     State.idx++;
-                    if(State.idx >= State.sessionPool.length) {
-                        alert("Hoàn thành bài tập!");
-                        Modules.TO.open();
-                    } else {
-                        Modules.Quiz.render();
-                    }
+                    if(State.idx >= State.sessionPool.length) { alert("Xong bài tập!"); Modules.TO.open(); }
+                    else Modules.Quiz.render();
                 }
             }
         };
 
         onValue(ref(db, 'flash_vocab/'), (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                State.vocab = data;
+            if (snapshot.exists()) {
+                State.vocab = snapshot.val();
                 Modules.UI.renderMain();
+                if(document.getElementById('tl-overlay').style.display === 'block') Modules.TL.render();
             }
         });
 
         window.Modules = Modules;
-        window.State = State;
     </script>
 </body>
 </html>
