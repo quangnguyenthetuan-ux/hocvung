@@ -357,7 +357,16 @@
             }
         },
 Utils: {
-            save: () => localStorage.setItem(DB_KEY, JSON.stringify(State.vocab)),
+            save: () => {
+        // 1. Lưu vào máy (phòng khi mất mạng)
+        localStorage.setItem(DB_KEY, JSON.stringify(State.vocab));
+        
+        // 2. QUAN TRỌNG: Đẩy danh sách đã xóa/sửa lên Firebase
+        if (typeof db !== 'undefined') {
+            set(ref(db, 'flash_vocab/'), State.vocab);
+            console.log("đã cập nhật thay đổi lên mây!");
+        }
+    },
             getNow: () => { const d = new Date(); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`; },
             
             // 1. Hàm fix lỗi "is not a function" bạn vừa gặp
@@ -927,7 +936,7 @@ window.addEventListener('keydown', e => {
 });
 // --- THÊM ĐOẠN NÀY VÀO TRONG <script type="module"> CỦA APP CŨ ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyB-dtRxkkhXZ8UTuBNi81tSGf-RHFRVtrw",
