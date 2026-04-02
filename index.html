@@ -323,7 +323,7 @@
         <button class="mode-btn" style="width: 100%; padding: 12px; margin-top: 5px;" onclick="Modules.Import.process()">🚀 Bắt đầu nhập liệu</button>
     </div>
 </div>
-    <script>
+    <script type="module">
         const DB_KEY = 'FLASH_VOCAB_FINAL';
         const DAILY_KEY = 'FLASH_DAILY_DATA';
 
@@ -1077,6 +1077,7 @@ onValue(ref(db, 'flash_vocab/'), (snapshot) => {
 // Gán ra toàn cục để các nút bấm HTML cũ (onclick="Modules...") không bị lỗi
 window.Modules = Modules;
 window.State = State;
+
     </script>
 </body>
 </html>
