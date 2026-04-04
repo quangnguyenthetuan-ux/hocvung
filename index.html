@@ -318,7 +318,75 @@
                 if(document.getElementById('tl-overlay').style.display === 'block') Modules.TL.render();
             }
         });
+// --- BỘ LẮNG NGHE TÌM KIẾM THÔNG MINH (Bản Mobile Cập Nhật Ngày) ---
+document.getElementById('search-input').addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter') {
+        const input = e.target;
+        const val = input.value.trim().toLowerCase();
+        if (!val) return;
 
+        // 1. Kiểm tra xem từ đã có trong thư viện chưa
+        const found = State.vocab.find(x => x.w === val);
+        if (found) {
+            found.c++; // Tăng số tia sét
+            
+            // CẬP NHẬT NGÀY VỀ HÔM NAY (Để từ này hiện lên danh sách học hôm nay)
+            const d = new Date();
+            found.d = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`; 
+            
+            Modules.Utils.save(); // Hàm save này đã bao gồm việc đẩy lên Firebase
+            Modules.UI.renderMain(); // Vẽ lại màn hình chính
+            
+            alert(`Đã cập nhật ngày học hôm nay cho từ: "${val}"\nSố tia sét: ${found.c}`);
+            input.value = '';
+            return;
+        }
+
+        // 2. Nếu từ chưa có -> Bắt đầu tra cứu tự động
+        input.placeholder = "🔍 Đang tra cứu...";
+        input.disabled = true;
+
+        try {
+            // Tra từ điển và dịch
+            const resDict = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${val}`);
+            const dataDict = await resDict.json();
+            const resTrans = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${val}`);
+            const dataTrans = await resTrans.json();
+
+            if (resDict.ok) {
+                const entry = dataDict[0];
+                const ipa = entry.phonetic || "";
+                const vi = dataTrans[0][0][0];
+                const enDef = entry.meanings[0].definitions[0].definition;
+                
+                // Chuẩn hóa nghĩa theo đúng format của bạn
+                const fullMeaning = `${ipa} // (n/v) ${vi} // 📖 ${enDef}`;
+                const today = `${new Date().getDate()}/${new Date().getMonth()+1}/${new Date().getFullYear()}`;
+
+                // Lưu từ mới (Sử dụng entry.word để lấy từ gốc)
+                State.vocab.push({ 
+                    w: entry.word.toLowerCase(), 
+                    m: fullMeaning, 
+                    c: 1, 
+                    d: today 
+                });
+                
+                Modules.Utils.save();
+                Modules.UI.renderMain();
+                alert(`Đã thêm từ mới: ${entry.word}`);
+            } else {
+                alert("Không tìm thấy từ này trong từ điển!");
+            }
+        } catch (err) {
+            alert("Lỗi kết nối mạng!");
+        } finally {
+            input.disabled = false;
+            input.placeholder = "Tìm kiếm nhanh...";
+            input.value = '';
+            input.focus();
+        }
+    }
+});
         window.Modules = Modules;
     </script>
 </body>
